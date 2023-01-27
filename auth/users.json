@@ -1,0 +1,38 @@
+{
+    "babakzare": {
+        "password": "babakzare", 
+        "balance": 2500, 
+        "role": "user", 
+        "discounts": {}, 
+        "purchases": {
+            "6784": {
+                "cart": {
+                    "fruit": {
+                        "orange": {
+                            "amount": 1, 
+                            "price": 12000
+                        }, 
+                        "apple": {
+                            "amount": 1, 
+                            "price": 10500
+                        }
+                    }
+                }
+            }, 
+            "2514": {
+                "cart": {
+                    "fruit": {
+                        "bannana": {
+                            "amount": 1, 
+                            "price": 30000
+                        }, 
+                        "apple": {
+                            "amount": 2, 
+                            "price": 10500
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

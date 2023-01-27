@@ -1,0 +1,26 @@
+{
+    "fruit": {
+        "orange": {
+            "price": 12000, 
+            "amount": 6
+        }, 
+        "apple": {
+            "price": 10500, 
+            "amount": 10
+        }, 
+        "bannana": {
+            "price": 30000, 
+            "amount": 19
+        }
+    }, 
+    "meat": {
+        "beef": {
+            "price": 120000, 
+            "amount": 3
+        }, 
+        "fish": {
+            "price": 230000, 
+            "amount": 19
+        }
+    }
+}
