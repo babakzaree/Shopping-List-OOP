@@ -78,7 +78,6 @@ class User(BaseUser):
         with open("./auth/users.json", mode='r') as f:
             users_json: dict = json.load(f)
 
-        
         # add new key,value pairs to users.json
         users_json[self.username]['purchases'][purchase_no] = {
             'cart': cart
