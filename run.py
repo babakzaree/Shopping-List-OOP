@@ -1,11 +1,16 @@
 from auth import User
 from product import Product
 from helpers.banner import print_banner
-from helpers.messages import Message
+from helpers.messages import Message, PasswordErrors, UsernameErrors
 from helpers.commands import Command
 from helpers.colorama_funcs import blue, green, red, yellow
 from helpers.help import print_help
-from helpers.exceptions import RemoveProductError
+from helpers.exceptions import (
+    PasswordLengthError,
+    RemoveProductError,
+    TypeUsernameError,
+    TypePasswordError
+)
 from helpers.functions import (
     clear_screen,
     price_after_discount,
@@ -68,26 +73,42 @@ while logged_in is False:
             print("Creating an new account...\n")
             username = input('Username: ')
             password = input('Password: ')
-            # if account has been created successfuly
-            if User.create_account(username, password, 30000):
-                print(Message.ACCOUNT_CREATED)
-                print(blue("Username: ") + green(username))
-                print(blue("Password: ") + green(password))
-                print("Redirecting to Login page... 4 Seconds.")
-                time.sleep(4)
-                initial_command_input = 'login'
-            else:
-                print(red("Failed. Try again."))
+
+            # checking for username, password input correction
+            try:
+                # if account has been created successfuly
+                if User.create_account(username, password, 30000):
+                    print(Message.ACCOUNT_CREATED)
+                    print(blue("Username: ") + green(username))
+                    print(blue("Password: ") + green(password))
+                    print("Redirecting to Login page... 4 Seconds.")
+                    time.sleep(4)
+                    initial_command_input = 'login'
+                else:
+                    print(red("Failed. Try again."))
+            except TypeUsernameError:
+                print(yellow(UsernameErrors.USERNAME_TYPE_ERROR))
+
+            except TypePasswordError:
+                print(yellow(PasswordErrors.PASSWORD_TYPE_ERROR))
+
+            except PasswordLengthError:
+                print(yellow(PasswordErrors.PASSWORD_LENGTH_ERROR))
+
+            except TypeError:
+                print(yellow("Balance must be int or float."))
+
+            time.sleep(2)
 
     while logged_in is True:
         print(blue("* Home Page *"))
         print(f"({username})", end='')
         # if current user is an 'admin user' print like this
         if current_user_role == 'admin':
-            print(green(f" $ {str(current_user.get_balance())}"), end='')
+            print(green(f" ${str(current_user.get_balance())}"), end='')
             print(red(f" ({current_user_role})"))
         else:
-            print(green(f" $ {str(current_user.get_balance())}"))
+            print(green(f" ${str(current_user.get_balance())}"))
         print(Message.HELP_MESSAGE+'\n')
 
         # get the input from user in home page (main input)
@@ -111,15 +132,18 @@ while logged_in is False:
         elif user_input in Command.CHARGE.value:
             clear_screen()
             # get the value of charge for wallet to increase
-            charge_value = int(input('Value that you want to charge: '))
-            if not isinstance(charge_value, (int, float)):
-                print(red("Wrong type input. Value should be an number."))
-            else:
-                # add the charge to the instance of User and json database
-                current_user.add_balance(charge_value)
-                print("Your balance has been increased +", end='')
-                print(f"{green(str(charge_value))} $")
-                print(f"Current balance: {current_user.get_balance()}")
+            charge_value = input('Value that you want to charge: ')
+            try:
+                charge_value = int(charge_value)
+                # if casting to int was successful
+                if isinstance(charge_value, int):
+                    # add the charge to the instance of User and json database
+                    current_user.add_balance(charge_value)
+                    print("Your balance has been increased ", end='')
+                    print(f"{green('+'+str(charge_value))} $")
+                    print(f"Current balance: {current_user.get_balance()}")
+            except ValueError:
+                print(red("Wrong input. Value should be an number."))
 
         # < Change Password >
         elif user_input in Command.CHANGE_PASSWORD.value:
@@ -191,14 +215,14 @@ while logged_in is False:
             else:
                 product_name = input("Product Name: ").strip().casefold()
                 product_amount = int(input("Amount: "))
-                if product_category.isdigit():
-                    print(red("Category should be an string, not int."))
+                if not product_category.isalpha():
+                    print(red("Category should be an string."))
 
-                elif product_name.isdigit():
-                    print(red("Product Name should be an string not int."))
+                elif not product_name.isalpha():
+                    print(red("Product Name should be an string."))
 
                 elif not isinstance(product_amount, int):
-                    print(red("Amount should be an Integer."))
+                    print(red("Entered amount should be an integer."))
 
                 else:
                     if Product.is_available(

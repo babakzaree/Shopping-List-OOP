@@ -1,6 +1,5 @@
 from helpers.exceptions import (
     TypeUsernameError,
-    WrongUsernameError,
     PasswordLengthError,
     TypePasswordError
     )
@@ -38,7 +37,7 @@ class BaseUser:
         if not isinstance(value, str):
             raise TypeUsernameError()
         if not value[0].isalpha():
-            raise WrongUsernameError()
+            raise TypeUsernameError()
         self.__username = value
 
     @property
@@ -255,6 +254,24 @@ class User(BaseUser):
 
     @classmethod
     def create_account(cls, username, password, balance):
+        # checking balance if its correct
+        if not isinstance(balance, (int, float)):
+            raise TypeError("Balance must be int or float.")
+        if balance < 0:
+            balance = abs(balance)
+
+        # checking username if its correct
+        if not isinstance(username, str):
+            raise TypeUsernameError()
+        if not username[0].isalpha():
+            raise TypeUsernameError()
+
+        # checking password if its correct
+        if not isinstance(password, str):
+            raise TypePasswordError()
+        if len(password) < 8:
+            raise PasswordLengthError()
+
         result = False
         with open('./auth/users.json', mode='r') as f:
             users_json = json.load(f)
